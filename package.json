@@ -1,15 +1,27 @@
 {
   "name": "@codianz/typed-worker",
   "version": "0.0.0",
-  "description": "Type constraints and simple inline for Web Worker.",
+  "description": "Make Web Worker easy and type-safe.",
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
     "prepare": "tsc",
     "deploy": "npm publish --access=public"
   },
+  "keywords": [
+    "WebWorker",
+    "simple",
+    "thread",
+    "type-safe",
+    "Typescript"
+  ],
   "author": "terukazu.inoue@codianz.com",
   "license": "MIT",
+  "homepage": "https://github.com/CODIANZ/npm.typed-worker",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CODIANZ/npm.typed-worker.git"
+  },
   "devDependencies": {
     "typescript": "^4.7.2"
   }
