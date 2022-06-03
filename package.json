@@ -1,6 +1,6 @@
 {
   "name": "@codianz/typed-worker",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Make Web Worker easy and type-safe.",
   "main": "./dist/index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "type-safe",
     "Typescript"
   ],
-  "author": "terukazu.inoue@codianz.com",
+  "author": "Terukazu Inoue",
   "license": "MIT",
   "homepage": "https://github.com/CODIANZ/npm.typed-worker",
   "repository": {
