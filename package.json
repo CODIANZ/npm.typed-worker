@@ -1,0 +1,16 @@
+{
+  "name": "@codianz/typed-worker",
+  "version": "0.0.0",
+  "description": "Type constraints and simple inline for Web Worker.",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "deploy": "npm publish --access=public"
+  },
+  "author": "terukazu.inoue@codianz.com",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.7.2"
+  }
+}
