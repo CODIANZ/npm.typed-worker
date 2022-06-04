@@ -1,4 +1,4 @@
-# typed-worder
+# typed-worker
 
 ## description
 
