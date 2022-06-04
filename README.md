@@ -19,19 +19,27 @@ const worker = new TypedWorker( func );
 
 Execute the function passed at initialization in WebWorker.
 The argument of `execute()` is specified by setting the argument of the function executed by WebWorker to Tuple.
-`execute()` returns `Promise`, so let's wait for the Web Worker to finish processing.
+`execute()` returns `Mediator<>`.
+You can use `Mediator<>.promse` to detect worker thread terminations and errors.
+You can also suspend her worker thread by calling `Mediator<>.abort()`.
 
 ```ts
-worker.execute( [ param1, param2, param3, ...] )
+const mediator = worker.execute( [ param1, param2, param3, ...] );
+
+mediator.promise
 .then((result) => {
   /* hogehoge */
 })
 .catch((err) => {
   /* fugafuga */
-})
+});
+
+mediator.abort();
 ```
 
 ## sample
+
+### basic
 
 ```ts
 import { TypedWorker } from "@codianz/typed-worker";
@@ -45,18 +53,18 @@ function add_in_worker(a: number, b: number, c: string) {
 
 const worker = new TypedWorker(add_in_worker);
 
-worker.execute([1, 2, "abc"])
-  .promise
-  .then((re) => {
+worker
+  .execute([1, 2, "abc"])
+  .promise.then((re) => {
     console.log(re);
   })
   .catch((err) => {
     console.error(err.message);
   });
 
-worker.execute([1, 2, "error"])
-  .promise
-  .then((re) => {
+worker
+  .execute([1, 2, "error"])
+  .promise.then((re) => {
     console.log(re);
   })
   .catch((err: Error) => {
@@ -71,4 +79,50 @@ The results are as follows.
 ```
 [LOG]: "abc : 1 + 2 = 3"
 [ERR]: "Uncaught Error: error : 1 + 2 = 3" 
+```
+
+### abort
+
+```ts
+function resolve_with_delay(s: string) {
+  function deep_loop(x: number) {
+    for (let i = 0; i < x; i++) {
+      deep_loop(x - 1);
+    }
+  }
+  deep_loop(12);
+  return "finish: #1";
+}
+
+const worker = new TypedWorker(resolve_with_delay);
+
+const med = worker.execute(["#1"]);
+med.promise
+  .then((re) => {
+    console.log(re);
+  })
+  .catch((err: Error) => {
+    console.error(err.message);
+  });
+
+const med2 = worker.execute(["#2"]);
+med2.promise
+  .then((re) => {
+    console.log(re);
+  })
+  .catch((err: Error) => {
+    console.error(err.message);
+  });
+
+setTimeout(() => {
+  med2.abort(new Error("abort!"));
+}, 1000);
+```
+
+The results are as follows.
+
+
+```
+[ERR]: "abort!" 
+[LOG]: "finish: #1"
 ```
