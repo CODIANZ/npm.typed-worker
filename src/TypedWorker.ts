@@ -1,3 +1,5 @@
+import { Mediator } from "./Mediator";
+
 export class TypedWorker<FUNC extends (...args: any[]) => any> {
   private m_func: FUNC;
 
@@ -5,7 +7,7 @@ export class TypedWorker<FUNC extends (...args: any[]) => any> {
     this.m_func = func;
   }
 
-  public execute(params: Parameters<FUNC>): Promise<ReturnType<FUNC>> {
+  public execute(params: Parameters<FUNC>): Mediator<ReturnType<FUNC>> {
     const url = window.URL.createObjectURL(
       new Blob(
         [
@@ -22,7 +24,12 @@ export class TypedWorker<FUNC extends (...args: any[]) => any> {
       worker.terminate();
       URL.revokeObjectURL(url);
     };
-    return new Promise((resolve, reject) => {
+
+    /** It works but unpleasant code for C++er! */
+    let reject_in_promise: (reason?: any) => void;
+
+    const promise = new Promise<ReturnType<FUNC>>((resolve, reject) => {
+      reject_in_promise = reject;
       worker.onmessage = (e) => {
         resolve(e.data);
         destruct();
@@ -33,5 +40,13 @@ export class TypedWorker<FUNC extends (...args: any[]) => any> {
       };
       worker.postMessage(params);
     });
+
+    return {
+      abort(reason?: Error) {
+        reject_in_promise(reason ?? new Error("aborted"));
+        destruct();
+      },
+      promise: promise
+    }
   }
 }
