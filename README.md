@@ -46,6 +46,7 @@ function add_in_worker(a: number, b: number, c: string) {
 const worker = new TypedWorker(add_in_worker);
 
 worker.execute([1, 2, "abc"])
+  .promise
   .then((re) => {
     console.log(re);
   })
@@ -54,6 +55,7 @@ worker.execute([1, 2, "abc"])
   });
 
 worker.execute([1, 2, "error"])
+  .promise
   .then((re) => {
     console.log(re);
   })
