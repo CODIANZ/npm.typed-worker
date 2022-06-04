@@ -25,6 +25,7 @@ export class TypedWorker<FUNC extends (...args: any[]) => any> {
       URL.revokeObjectURL(url);
     };
 
+    /** It works but unpleasant code for C++er! */
     let reject_in_promise: (reason?: any) => void;
 
     const promise = new Promise<ReturnType<FUNC>>((resolve, reject) => {
