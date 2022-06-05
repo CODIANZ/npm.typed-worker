@@ -37,6 +37,15 @@ mediator.promise
 mediator.abort();
 ```
 
+### debug mode
+
+You can use debug mode.
+Debug mode simply replaces `execute()` with `debugExecute()`.
+In debug mode, you can execute the function you want to execute asynchronously in the main thread and debug the function itself.
+
+Debug mode is simple.
+So use your browser's developer tools to observe timing-dependent programs.
+
 ## sample
 
 ### basic
@@ -125,4 +134,46 @@ The results are as follows.
 ```
 [ERR]: "abort!" 
 [LOG]: "finish: #1"
+```
+
+### debug mode
+
+```ts
+import { TypedWorker } from "@codianz/typed-worker";
+
+function add_in_worker(a: number, b: number, c: string) {
+  if (c === "error") {
+    throw new Error(`${c} : ${a} + ${b} = ${a + b}`);
+  }
+  return `${c} : ${a} + ${b} = ${a + b}`;
+}
+
+const worker = new TypedWorker(add_in_worker);
+
+worker
+  .debugExecute([1, 2, "abc"])
+  .promise.then((re) => {
+    console.log(re);
+  })
+  .catch((err) => {
+    console.error(err.message);
+  });
+
+worker
+  .debugExecute([1, 2, "error"])
+  .promise.then((re) => {
+    console.log(re);
+  })
+  .catch((err: Error) => {
+    console.error(err.message);
+  });
+```
+
+
+The results are as follows.
+
+
+```
+[LOG]: "abc : 1 + 2 = 3"
+[ERR]: "Uncaught Error: error : 1 + 2 = 3" 
 ```

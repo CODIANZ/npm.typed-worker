@@ -49,4 +49,25 @@ export class TypedWorker<FUNC extends (...args: any[]) => any> {
       promise: promise
     }
   }
+
+  public debugExecute(params: Parameters<FUNC>): Mediator<ReturnType<FUNC>> {
+    let reject_in_promise: (reason?: any) => void;
+    const promise = new Promise<ReturnType<FUNC>>((resolve, reject) => {
+      reject_in_promise = reject;
+      setTimeout(() => {
+        try {
+          resolve(this.m_func(...params));
+        }
+        catch(err) {
+          reject(err);
+        }
+      });
+    });
+    return {
+      abort(reason?: Error) {
+        reject_in_promise(reason ?? new Error("aborted"));
+      },
+      promise: promise
+    }
+  }
 }
