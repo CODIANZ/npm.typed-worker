@@ -100,7 +100,7 @@ function resolve_with_delay(s: string) {
     }
   }
   deep_loop(12);
-  return "finish: #1";
+  return `finish: ${s}`;
 }
 
 const worker = new TypedWorker(resolve_with_delay);
