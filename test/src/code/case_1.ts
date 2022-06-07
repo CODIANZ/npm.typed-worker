@@ -8,25 +8,15 @@ export function case_1() {
     });
     console.log("case_1()", "generateRandom end");
     counter[0] = 1;
-    const n = Atomics.notify(counter, 0, 1);
+    const n = Atomics.notify(counter, 0);
     console.log("case_1()", `Atomics.notify() -> ${n}`);
   }
 
   function calculateArray(arr: Float64Array, counter: Int32Array) {
     console.log("case_1()", "calculateArray begin");
-    let bContinue = true;
-    while (bContinue) {
-      const re = Atomics.wait(counter, 0, 1);
-      if (re == "ok") {
-        console.log("case_1()", "calculateArray Atomics.wait() -> ok");
-        bContinue = false;
-        return arr.reduce((p, c) => p + c);
-      } else if (re == "not-equal") {
-        /** continue */
-      } else {
-        throw new Error(`Atomics.wait() -> ${re}`);
-      }
-    }
+    const re = Atomics.wait(counter, 0, 0);
+    console.log("case_1()", `calculateArray Atomics.wait() -> ${re}`);
+    return arr.reduce((p, c) => p + c);
   }
 
   const counter = new Int32Array(new SharedArrayBuffer(1 * 4));
