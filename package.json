@@ -1,6 +1,6 @@
 {
   "name": "@codianz/typed-worker",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Make Web Worker easy and type-safe.",
   "main": "./dist/index.js",
   "scripts": {
@@ -13,7 +13,8 @@
     "simple",
     "thread",
     "type-safe",
-    "Typescript"
+    "Typescript",
+    "mutex"
   ],
   "author": "Terukazu Inoue",
   "license": "MIT",
