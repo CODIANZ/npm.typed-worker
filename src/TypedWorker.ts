@@ -1,4 +1,5 @@
 import { Mediator } from "./Mediator";
+import { Mutex } from "./Mutex";
 
 export class TypedWorker<FUNC extends (...args: any[]) => any> {
   private m_func: FUNC;
@@ -11,7 +12,16 @@ export class TypedWorker<FUNC extends (...args: any[]) => any> {
     const url = window.URL.createObjectURL(
       new Blob(
         [
-          `self.onmessage = function (e) { self.postMessage(${this.m_func.toString()}(...e.data)); };`
+`
+${Mutex.generateSourceCodeForWorker()}
+self.onmessage = function (e) {
+  e.data.forEach((x, i) => {
+    if(typeof x === "object" && "___magic___" in x && x.___magic___ === "${Mutex.MAGIC}"){
+      e.data[i] = new Mutex(x);
+    }
+  });
+  self.postMessage(${this.m_func.toString()}(...e.data));
+};`
         ],
         {
           type: "text/javascript"
