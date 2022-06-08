@@ -53,7 +53,14 @@ Use `Mutex` if you want to safely handle the memory shared between worker thread
 
 You can synchronize by passing `Mutex` object to a function that runs on a WebWorker.
 This `Mutex` object must be created in the main thread. It cannot be generated within a Web Worker.
+Also, `Mutex` cannot be used with `debugExecute()`.
 
+`Mutex` uses `SharedArrayBuffer`. So you need the following HTTP response headers.
+
+```
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Embedder-Policy: require-corp
+```
 
 ## sample
 
