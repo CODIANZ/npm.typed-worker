@@ -5,9 +5,10 @@ export class Mutex {
   public static MAGIC = "bu6ecYdPgFgSdIabqHcABWV9d0dyNIo6BbkRNJrH4Ny0wvCpNfNbtoB4FukC9wKK6TyyjOla542WDbpxabjkPlMiyYGvPsTAbiF3WdV8EIQRT9UCJwQ0GuFDTTToWSs3";
   private m_arr: Int32Array;
   private ___magic___ = Mutex.MAGIC;
+  private static s_source: string | undefined = undefined;
 
-  constructor(src?: Mutex) {
-    this.m_arr = src?.m_arr ?? new Int32Array(new SharedArrayBuffer(4));
+  constructor() {
+    this.m_arr = new Int32Array(new SharedArrayBuffer(4));
   }
 
   lock() {
@@ -53,19 +54,22 @@ export class Mutex {
   }
   
   static generateSourceCodeForWorker() {
-    const mtx = new Mutex();
-    return `
+    if(!Mutex.s_source){
+      const mtx = new Mutex();
+      Mutex.s_source = `
 class Mutex {
   static INDEX = 0;
   static UNLOCKED = 0;
   static LOCKED = 1;
   m_arr;
   constructor(src) {
-    this.m_arr = src?.m_arr ?? new Int32Array(new SharedArrayBuffer(4));
+    this.m_arr = src.m_arr;
   }
   ${mtx.lock.toString()}
   ${mtx.unlock.toString()}
   ${mtx.scoped_lock.toString()}
 }`;
+    }
+    return Mutex.s_source;
   }
 }
