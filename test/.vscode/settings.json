@@ -1,5 +1,5 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "prettier.trailingComma": "none"
+  "__prettier.trailingComma": "none"
 }

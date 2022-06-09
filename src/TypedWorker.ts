@@ -3,12 +3,17 @@ import { Mutex } from "./Mutex";
 
 export class TypedWorker<FUNC extends (...args: any[]) => any> {
   private m_func: FUNC;
+  private m_func_source?: string;
 
   public constructor(func: FUNC) {
     this.m_func = func;
   }
 
   public execute(params: Parameters<FUNC>): Mediator<ReturnType<FUNC>> {
+    if(!this.m_func_source){
+      this.m_func_source = this.m_func.toString();
+    }
+
     const url = window.URL.createObjectURL(
       new Blob(
         [
@@ -20,7 +25,7 @@ self.onmessage = function (e) {
       e.data[i] = new Mutex(x);
     }
   });
-  self.postMessage(${this.m_func.toString()}(...e.data));
+  self.postMessage(${this.m_func_source}(...e.data));
 };`
         ],
         {
