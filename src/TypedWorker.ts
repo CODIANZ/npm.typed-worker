@@ -14,11 +14,12 @@ export class TypedWorker<FUNC extends (...args: any[]) => any> {
       this.m_func_source = this.m_func.toString();
     }
 
+    const mutexSourceCode = params.find(x => x instanceof Mutex) ? Mutex.generateSourceCodeForWorker() : "";
     const url = window.URL.createObjectURL(
       new Blob(
         [
 `
-${Mutex.generateSourceCodeForWorker()}
+${mutexSourceCode}
 self.onmessage = function (e) {
   e.data.forEach((x, i) => {
     if(typeof x === "object" && "___magic___" in x && x.___magic___ === "${Mutex.MAGIC}"){

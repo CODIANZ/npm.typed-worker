@@ -8,6 +8,9 @@ export class Mutex {
   private static s_source: string | undefined = undefined;
 
   constructor() {
+    if(!SharedArrayBuffer){
+      throw new Error("cannot use Mutex because SharedArrayBuffer is undefined");
+    }
     this.m_arr = new Int32Array(new SharedArrayBuffer(4));
   }
 
