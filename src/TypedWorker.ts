@@ -26,7 +26,7 @@ self.onmessage = function (e) {
       e.data[i] = new Mutex(x);
     }
   });
-  self.postMessage(${this.m_func_source}(...e.data));
+  self.postMessage((${this.m_func_source})(...e.data));
 };`
         ],
         {
