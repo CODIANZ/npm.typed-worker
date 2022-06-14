@@ -4,9 +4,12 @@ import { Mutex } from "./Mutex";
 export class TypedWorker<FUNC extends (...args: any[]) => any> {
   private m_func: FUNC;
   private m_func_source?: string;
+  private m_export_functions?:  ((...args: any[])=>any)[];
+  private m_export_functions_source?: string;
 
-  public constructor(func: FUNC) {
+  public constructor(func: FUNC, exportFunctions?: ((...args: any[])=>any)[]) {
     this.m_func = func;
+    this.m_export_functions = exportFunctions;
   }
 
   public execute(params: Parameters<FUNC>): Mediator<ReturnType<FUNC>> {
@@ -14,11 +17,19 @@ export class TypedWorker<FUNC extends (...args: any[]) => any> {
       this.m_func_source = this.m_func.toString();
     }
 
+    if(!this.m_export_functions_source){
+      this.m_export_functions_source = "";
+      this.m_export_functions?.forEach(f => {
+        this.m_export_functions_source += `function ${f.name}(...args){return (${f.toString()})(...args);};`
+      });
+    }
+
     const mutexSourceCode = params.find(x => x instanceof Mutex) ? Mutex.generateSourceCodeForWorker() : "";
     const url = window.URL.createObjectURL(
       new Blob(
         [
 `
+${this.m_export_functions_source}
 ${mutexSourceCode}
 self.onmessage = function (e) {
   e.data.forEach((x, i) => {
