@@ -1,6 +1,6 @@
 {
   "name": "@codianz/typed-worker",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Make Web Worker easy and type-safe.",
   "main": "./dist/index.js",
   "scripts": {

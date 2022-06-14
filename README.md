@@ -12,8 +12,19 @@ It is simple to use because it has a built-in messaging system.
 Create a TypedWorker object by specifying the function you want to call in the Web Worker as a parameter.
 
 ```ts
-const worker = new TypedWorker( func );
+const worker = new TypedWorker( func, exportFunctions );
 ```
+
+#### parameters
+
+##### func
+
+The function you want to execute in Web Worker
+
+##### exportFunctions (optional)
+
+Specify the external functions used by `func` as an array and export them to WebWorker.
+
 
 ### execute
 
@@ -256,4 +267,42 @@ The results are as follows.
 ```
 [LOG]: "blocking_result:  2000"
 [LOG]: "non_blocking_result:  1076"
+```
+
+### export functions
+
+```ts
+import { TypedWorker } from "../../../dist";
+
+export function export_functions() {
+  return new Promise((resolve) => {
+    function inner_func_1(a: number, b: number) {
+      return `innner_func_1 -> ${a + b}`;
+    }
+    const inner_func_2 = (c: string) => {
+      return `inner_func_2 -> ${c}`;
+    };
+
+    function add_in_worker(a: number, b: number, c: string) {
+      return `${inner_func_2(c)} : ${a} + ${b} = ${inner_func_1(a, b)}`;
+    }
+
+    const worker = new TypedWorker(add_in_worker, [inner_func_1, inner_func_2]);
+
+    worker
+      .execute([1, 2, "abc"])
+      .promise.then((re) => {
+        console.log(re);
+      })
+      .catch((err) => {
+        console.error(err.message);
+      });
+  });
+}
+```
+
+The results are as follows.
+
+```
+[LOG]: "inner_func_2 -> abc : 1 + 2 = innner_func_1 -> 3"
 ```
