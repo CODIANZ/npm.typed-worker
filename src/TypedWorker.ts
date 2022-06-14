@@ -6,6 +6,7 @@ export class TypedWorker<FUNC extends (...args: any[]) => any> {
   private m_func_source?: string;
   private m_export_functions?:  ((...args: any[])=>any)[];
   private m_export_functions_source?: string;
+  private m_mutex_source?: string;
 
   public constructor(func: FUNC, exportFunctions?: ((...args: any[])=>any)[]) {
     this.m_func = func;
@@ -24,13 +25,16 @@ export class TypedWorker<FUNC extends (...args: any[]) => any> {
       });
     }
 
-    const mutexSourceCode = params.find(x => x instanceof Mutex) ? Mutex.generateSourceCodeForWorker() : "";
+    if(!this.m_mutex_source){
+      this.m_mutex_source = params.find(x => x instanceof Mutex) ? Mutex.generateSourceCodeForWorker() : undefined;
+    }
+
     const url = window.URL.createObjectURL(
       new Blob(
         [
 `
 ${this.m_export_functions_source}
-${mutexSourceCode}
+${this.m_mutex_source ?? ""}
 self.onmessage = function (e) {
   e.data.forEach((x, i) => {
     if(typeof x === "object" && "___magic___" in x && x.___magic___ === "${Mutex.MAGIC}"){
