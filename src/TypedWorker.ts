@@ -4,11 +4,14 @@ import { Mutex } from "./Mutex";
 export class TypedWorker<FUNC extends (...args: any[]) => any> {
   private m_func: FUNC;
   private m_func_source?: string;
-  private m_export_functions?:  ((...args: any[])=>any)[];
+  private m_export_functions?:  Function[];
   private m_export_functions_source?: string;
   private m_mutex_source?: string;
+  private static stripWebpackInjections(source: string){
+    return source.replaceAll(/\(\d+,\S+?WEBPACK_IMPORTED_MODULE.+?\)\(.+?\);/g, "")
+  }
 
-  public constructor(func: FUNC, exportFunctions?: ((...args: any[])=>any)[]) {
+  public constructor(func: FUNC, exportFunctions?: Function[]) {
     this.m_func = func;
     this.m_export_functions = exportFunctions;
   }
@@ -21,7 +24,16 @@ export class TypedWorker<FUNC extends (...args: any[]) => any> {
     if(!this.m_export_functions_source){
       this.m_export_functions_source = "";
       this.m_export_functions?.forEach(f => {
-        this.m_export_functions_source += `function ${f.name}(...args){return (${f.toString()})(...args);};`
+        const code = f.toString();
+        if(/^class\s/.test(code)){
+          this.m_export_functions_source += `${TypedWorker.stripWebpackInjections(code)};`;
+        }
+        else if(/^function\s/.test(code)){
+          this.m_export_functions_source += `${code};`;
+        }
+        else{
+          this.m_export_functions_source += `function ${f.name}(...args){return (${code})(...args);};`
+        }
       });
     }
 

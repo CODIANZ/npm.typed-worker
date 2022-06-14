@@ -269,7 +269,7 @@ The results are as follows.
 [LOG]: "non_blocking_result:  1076"
 ```
 
-### export functions
+### export functions & class
 
 ```ts
 import { TypedWorker } from "../../../dist";
@@ -282,20 +282,37 @@ export function export_functions() {
     const inner_func_2 = (c: string) => {
       return `inner_func_2 -> ${c}`;
     };
-
-    function add_in_worker(a: number, b: number, c: string) {
-      return `${inner_func_2(c)} : ${a} + ${b} = ${inner_func_1(a, b)}`;
+    class inner_class {
+      private m_str: string;
+      constructor(a: number, b: number, c: string) {
+        this.m_str = `inner_class -> ${a}, ${b}, ${c}`;
+      }
+      get str() {
+        return this.m_str;
+      }
     }
 
-    const worker = new TypedWorker(add_in_worker, [inner_func_1, inner_func_2]);
+    function add_in_worker(a: number, b: number, c: string) {
+      const cls = new inner_class(a, b, c);
+      return `${cls.str}\n${inner_func_2(c)} : ${a} + ${b} = ${inner_func_1(
+        a,
+        b
+      )}`;
+    }
+
+    const worker = new TypedWorker(add_in_worker, [
+      inner_func_1,
+      inner_func_2,
+      inner_class,
+    ]);
 
     worker
       .execute([1, 2, "abc"])
       .promise.then((re) => {
-        console.log(re);
+        console.log("export_functions()", re);
       })
       .catch((err) => {
-        console.error(err.message);
+        console.error("export_functions()", err.message);
       });
   });
 }
@@ -304,5 +321,6 @@ export function export_functions() {
 The results are as follows.
 
 ```
-[LOG]: "inner_func_2 -> abc : 1 + 2 = innner_func_1 -> 3"
+[LOG]: "inner_class -> 1, 2, abc
+inner_func_2 -> abc : 1 + 2 = innner_func_1 -> 3"
 ```

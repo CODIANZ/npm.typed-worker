@@ -8,12 +8,29 @@ export function export_functions() {
     const inner_func_2 = (c: string) => {
       return `inner_func_2 -> ${c}`;
     };
-
-    function add_in_worker(a: number, b: number, c: string) {
-      return `${inner_func_2(c)} : ${a} + ${b} = ${inner_func_1(a, b)}`;
+    class inner_class {
+      private m_str: string;
+      constructor(a: number, b: number, c: string) {
+        this.m_str = `inner_class -> ${a}, ${b}, ${c}`;
+      }
+      get str() {
+        return this.m_str;
+      }
     }
 
-    const worker = new TypedWorker(add_in_worker, [inner_func_1, inner_func_2]);
+    function add_in_worker(a: number, b: number, c: string) {
+      const cls = new inner_class(a, b, c);
+      return `${cls.str}\n${inner_func_2(c)} : ${a} + ${b} = ${inner_func_1(
+        a,
+        b
+      )}`;
+    }
+
+    const worker = new TypedWorker(add_in_worker, [
+      inner_func_1,
+      inner_func_2,
+      inner_class,
+    ]);
 
     worker
       .execute([1, 2, "abc"])
