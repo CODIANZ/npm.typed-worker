@@ -24,4 +24,7 @@ basic()
   })
   .then(() => {
     return export_functions();
+  })
+  .then(() => {
+    console.log("finish!");
   });

@@ -5,9 +5,11 @@ export function export_functions() {
     function inner_func_1(a: number, b: number) {
       return `innner_func_1 -> ${a + b}`;
     }
+
     const inner_func_2 = (c: string) => {
       return `inner_func_2 -> ${c}`;
     };
+
     class inner_class {
       private m_str: string;
       constructor(a: number, b: number, c: string) {
@@ -36,9 +38,11 @@ export function export_functions() {
       .execute([1, 2, "abc"])
       .promise.then((re) => {
         console.log("export_functions()", re);
+        resolve(void 0);
       })
       .catch((err) => {
         console.error("export_functions()", err.message);
+        resolve(void 0);
       });
   });
 }
